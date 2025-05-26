@@ -1,22 +1,30 @@
 const express = require("express");
 
+const { userAuth } = require("./middleware/auth");
+
 const app = express();
 
-// ':' indicate dynamic route
-app.get("/user/:userID", (req, res) => {
-  console.log("req.query", req.query); //Req.query means passing query parmas using ? in url
-  console.log("req.params", req.params); // req.params means passing dynamic route using /: in url it will /user/101
-  res.send({ firstname: "Siddharth", lastname: "Pandya" });
+app.use("/admin", (req, res, next) => {
+  const token = "Sids";
+  const isAuthorized = token === "Sid";
+  if (!isAuthorized) {
+    res.status(401).send("Unauthorized user");
+  } else {
+    next();
+  }
 });
 
-app.post("/user", (req, res) => {
-  res.send("User Info Updated Sucessfully.");
+app.get("/user/login", (req, res) => {
+  res.send("User Logged in successfully");
 });
 
-// The app.use() accept all https method get post put etc so it send same for all http method
-// app.use("/test", (req, res) => {
-//   res.send("Hello From Server...");
-// });
+app.get("/user/getUser", userAuth, (req, res) => {
+  res.send("User data sended.");
+});
+
+app.get("/admin/getData", (req, res) => {
+  res.send("All admin data sended..");
+});
 
 app.listen(3000, () => {
   console.log("Server listing on port 3000");
