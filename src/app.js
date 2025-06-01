@@ -18,12 +18,6 @@ app.get("/user/login", (req, res) => {
   res.send("User Logged in successfully");
 });
 
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("Something went wrong.");
-  }
-});
-
 app.get("/user/getUser", userAuth, (req, res) => {
   // try {
   throw new Error("Erorr...");
