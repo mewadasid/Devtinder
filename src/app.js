@@ -18,12 +18,25 @@ app.get("/user/login", (req, res) => {
   res.send("User Logged in successfully");
 });
 
-app.get("/user/getUser", userAuth, (req, res) => {
-  res.send("User data sended.");
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Something went wrong.");
+  }
 });
 
-app.get("/admin/getData", (req, res) => {
-  res.send("All admin data sended..");
+app.get("/user/getUser", userAuth, (req, res) => {
+  // try {
+  throw new Error("Erorr...");
+  //   res.send("User data sended.");
+  // } catch (err) {
+  //   res.status(500).send("Something went wrong 2.");
+  // }
+});
+
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Something went wrong.");
+  }
 });
 
 app.listen(3000, () => {
