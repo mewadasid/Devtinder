@@ -1,38 +1,28 @@
 const express = require("express");
-
-const { userAuth } = require("./middleware/auth");
-
+const { connectDatabase } = require("./config/database");
+const User = require("./models/user");
 const app = express();
 
-app.use("/admin", (req, res, next) => {
-  const token = "Sids";
-  const isAuthorized = token === "Sid";
-  if (!isAuthorized) {
-    res.status(401).send("Unauthorized user");
-  } else {
-    next();
+app.use(express.json());
+app.post("/signup", async (req, res) => {
+  const user = new User(req.body);
+  try {
+    await user.save();
+    res.send("User Added Successfully");
+  } catch (err) {
+    res.status(400).send("Something went wrong" + err.message);
   }
 });
 
-app.get("/user/login", (req, res) => {
-  res.send("User Logged in successfully");
-});
-
-app.get("/user/getUser", userAuth, (req, res) => {
-  // try {
-  throw new Error("Erorr...");
-  //   res.send("User data sended.");
-  // } catch (err) {
-  //   res.status(500).send("Something went wrong 2.");
-  // }
-});
-
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("Something went wrong.");
-  }
-});
-
-app.listen(3000, () => {
-  console.log("Server listing on port 3000");
-});
+connectDatabase()
+  .then(() => {
+    // Why DB connection required first because if server start listening on port.
+    // and by some case db is not connected then it throws errors that's calling in this way.
+    console.log("Database connection established.");
+    app.listen(3000, () => {
+      console.log("Server listing on port 3000");
+    });
+  })
+  .catch((err) => {
+    console.error(err, "Connection failed");
+  });
