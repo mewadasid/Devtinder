@@ -6,8 +6,22 @@ const app = express();
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
+  const ALLOWED_FIELD = [
+    "firstName",
+    "lastName",
+    "emailId",
+    "password",
+    "gender",
+    "skills",
+    "age",
+  ];
+
   const user = new User(req.body);
   try {
+    const isFieldAllowed = Object.keys(req.body).every((k) =>
+      ALLOWED_FIELD.includes(k)
+    );
+    if (!isFieldAllowed) throw new Error("Requested body is not valid!");
     await user.save();
     res.send("User Added Successfully");
   } catch (err) {
@@ -52,10 +66,21 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.patch("/user", async (req, res) => {
+app.patch("/user/:userId", async (req, res) => {
   const userBody = req.body;
+  const userId = req.params.userId;
+
+  const ALLOWED_FIELD = ["gender", "skills", "age"];
   try {
-    const u = await User.findByIdAndUpdate(userBody.userId, userBody, {
+    const isFieldAllowed = Object.keys(userBody).every((k) =>
+      ALLOWED_FIELD.includes(k)
+    );
+    if (!isFieldAllowed) {
+      throw new Error(
+        "Different fields are come into body which not allowed!."
+      );
+    }
+    await User.findByIdAndUpdate(userId, userBody, {
       runValidators: true,
     });
     res.send("User updated Successfully");
